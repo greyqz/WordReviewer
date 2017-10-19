@@ -41,8 +41,7 @@ void vMain() {
 }
 
 void vWordView(string wd) {
-	cout << "  REVIEWING\n";
-	cout << "     " << wd << endl;
+	cout << "Question: [" << wd << "]\n";
 }
 
 int main() {
@@ -71,47 +70,63 @@ int main() {
 	while (getline(in, line)) {
 		words.push_back(line);
 	}
-	cout << "(loaded)\n";
+	cout << "(loading)\n"; Sleep(1000);
 
 	bool ope = true;
 	while (ope) {
+		vMain();
+
 		int n = words.size();
 		int rand_result = (rand() % n + rand() % n) % n;
 
-		string hid = words[rand_result], answer = hid;
-		int rand_res1 = rand() % hid.length(),
-		    rand_res2 = rand() % hid.length(),
-		    rand_res3 = rand() % hid.length(),
-		    rand_res4 = rand() % hid.length(),
-		    rand_res5 = rand() % hid.length();
+		string answer = words[rand_result], hid = answer;
+		vector<int> rand_res; int temp_rand;
+
+		if (hid.length() <= 3) {
+			hid = answer;
+		}
+		else for (int i = 1; i <= 3; i++) {
+			temp_rand = rand() % hid.length();
+
+			vector<int>::iterator fdnres = find(rand_res.begin(), rand_res.end(), temp_rand);
+			if (fdnres == rand_res.end())
+				rand_res.push_back(temp_rand);
+			else i--;
+		}
 		for (int i = 0; i < hid.length(); i++)
-			if (isalpha(hid[i])
-					&& i != rand_res1
-					&& i != rand_res2
-					&& i != rand_res3
-					&& i != rand_res4
-					&& i != rand_res5)
+			if (isalpha(hid[i]))
 				hid[i] = '_';
+		for (vector<int>::iterator iter = rand_res.begin(); iter != rand_res.end(); iter++)
+			if (hid[*iter] == '_') hid[*iter] = answer[*iter];
 
 		vWordView(hid);
 		string answer_line; int line_number = 0;
-		bool FirstTime = true;
-		cout << "Type answer:\n";
 		while (true) {
 			line_number++;
 			cout << "Guess " << line_number << "> ";
 			getline(cin, answer_line);
-			if (FirstTime && answer_line.empty()) getline(cin, answer_line);
-			FirstTime = false;
-			if (answer_line.empty()) {ope = false; break;}
+			if (answer_line.empty()) getline(cin, answer_line);
 			if (answer_line == "!") {
 				cout << "Ans> " << answer << "\n";
 				break;
 			}
 			if (answer_line != answer) {
-				cout << "Incorrect guess!\n";
+				cout << "Incorrect answer!\n";
+
+				for (int i = 1; i <= 1; i++) {
+					temp_rand = rand() % hid.length();
+					vector<int>::iterator fdnres = find(rand_res.begin(), rand_res.end(), temp_rand);
+					if (fdnres == rand_res.end())
+						rand_res.push_back(temp_rand);
+					else i--;
+				}
+				if (hid[temp_rand] == '_') hid[temp_rand] = answer[temp_rand];
+				vWordView(hid);
+
+				if (rand_res.size() == hid.length()) break;
 			} else {
-				cout << "Bingo!\n"; break;
+				cout << "Bingo!\n";
+				Sleep(1500); break;
 			}
 		}
 	}
